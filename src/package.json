@@ -1,0 +1,15 @@
+{
+  "name": "kotaniswap",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@uniswap/sdk": "^3.0.3",
+    "ethers": "^5.0.17"
+  }
+}
