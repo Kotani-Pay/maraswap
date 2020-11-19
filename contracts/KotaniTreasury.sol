@@ -1,26 +1,27 @@
+// SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "./uniswapv2/interfaces/IUniswapV2ERC20.sol";
-import "./uniswapv2/interfaces/IUniswapV2Pair.sol";
-import "./uniswapv2/interfaces/IUniswapV2Factory.sol";
+import "./kotani/interfaces/IKotaniERC20.sol";
+import "./kotani/interfaces/IKotaniPair.sol";
+import "./kotani/interfaces/IKotaniFactory.sol";
 
-// KotaniTreasury is Minter's left hand and kinda a wizard. He can cook up Kvt from pretty much anything!
+// KotaniTreasury is Minter's left hand and kinda a wizard. He can create Kvt from pretty much anything!
 //
-// This contract handles "serving up" rewards for xKvt holders by trading tokens collected from fees for Kvt.
+// This contract handles issuing rewards for xKvt holders by trading tokens collected from fees for Kvt.
 
 contract KotaniTreasury {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
-    IUniswapV2Factory public factory;
+    IKotaniFactory public factory;
     address public bar;
     address public kvt;
     address public weth;
 
-    constructor(IUniswapV2Factory _factory, address _bar, address _kvt, address _weth) public {
+    constructor(IKotaniFactory _factory, address _bar, address _kvt, address _weth) public {
         factory = _factory;
         kvt = _kvt;
         bar = _bar;
@@ -30,7 +31,7 @@ contract KotaniTreasury {
     function convert(address token0, address token1) public {
         // At least we try to make front-running harder to do.
         require(msg.sender == tx.origin, "do not convert from contract");
-        IUniswapV2Pair pair = IUniswapV2Pair(factory.getPair(token0, token1));
+        IKotaniPair pair = IKotaniPair(factory.getPair(token0, token1));
         pair.transfer(address(pair), pair.balanceOf(address(this)));
         pair.burn(address(this));
         // First we convert everything to WETH
@@ -54,7 +55,7 @@ contract KotaniTreasury {
             return amount;
         }
         // If the target pair doesn't exist, don't convert anything
-        IUniswapV2Pair pair = IUniswapV2Pair(factory.getPair(token, weth));
+        IKotaniPair pair = IKotaniPair(factory.getPair(token, weth));
         if (address(pair) == address(0)) {
             return 0;
         }
@@ -77,7 +78,7 @@ contract KotaniTreasury {
 
     // Converts WETH to Kvt
     function _toKVT(uint256 amountIn) internal {
-        IUniswapV2Pair pair = IUniswapV2Pair(factory.getPair(weth, kvt));
+        IKotaniPair pair = IKotaniPair(factory.getPair(weth, kvt));
         // Choose WETH as input token
         (uint reserve0, uint reserve1,) = pair.getReserves();
         address token0 = pair.token0();

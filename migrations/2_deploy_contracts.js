@@ -1,10 +1,11 @@
-const Factory = artifacts.require('uniswapv2/UniswapV2Factory.sol');
-const Router = artifacts.require('uniswapv2/UniswapV2Router02.sol');
+const Factory = artifacts.require('kotani/UniswapV2Factory.sol');
+const Router = artifacts.require('kotani/UniswapV2Router02.sol');
 const WETH = artifacts.require('WETH.sol');
 const MockERC20 = artifacts.require('MockERC20.sol');
 const CUSD = artifacts.require('CUSD.sol');
 const KES = artifacts.require('KES.sol');
 const KotaniToken = artifacts.require('KotaniToken.sol') 
+const SavingsCircle = artifacts.require("SavingsCircle");
 const Minter = artifacts.require('Minter.sol'); 
 const InvestorsVault = artifacts.require('InvestorsVault.sol');
 const KotaniTreasury = artifacts.require('KotaniTreasury.sol');
@@ -16,12 +17,13 @@ module.exports = async function(deployer, _network, addresses) {
   await deployer.deploy(WETH);
   await deployer.deploy(CUSD);
   await deployer.deploy(KES);
+  await deployer.deploy(SavingsCircle);
   const weth = await WETH.deployed();
   const tokenA = await MockERC20.new('Token A', 'TKA', web3.utils.toWei('100000'));
   const tokenB = await MockERC20.new('Token B', 'TKB', web3.utils.toWei('1000'));
   const cusd = await CUSD.deployed();
   const kes = await KES.deployed();
-
+  const sacco = await SavingsCircle.deployed();
 
   await deployer.deploy(Factory, admin);
   const factory = await Factory.deployed();
@@ -29,7 +31,7 @@ module.exports = async function(deployer, _network, addresses) {
   await factory.createPair(weth.address, tokenB.address);
   await factory.createPair(cusd.address, kes.address);
   await deployer.deploy(Router, factory.address, weth.address);
-  await deployer.deploy(Router, factory.address, cusd.address);
+  // await deployer.deploy(Router, factory.address, cusd.address);
   const router = await Router.deployed();
 
   await deployer.deploy(KotaniToken);

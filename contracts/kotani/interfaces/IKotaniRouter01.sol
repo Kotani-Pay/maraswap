@@ -1,8 +1,10 @@
+// SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.6.2;
 
-interface IUniswapV2Router01 {
+interface IKotaniRouter01 {
     function factory() external pure returns (address);
     function WETH() external pure returns (address);
+    // function CUSD() external pure returns (address);
 
     function addLiquidity(
         address tokenA,

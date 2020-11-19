@@ -4,13 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npm test"
+    "test": "npm test",
+    "start": "node dexApi.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@koa/router": "^9.4.0",
     "@uniswap/sdk": "^3.0.3",
+    "dotenv": "^8.2.0",
+    "ethereumjs-tx": "^2.1.2",
     "ethers": "^5.0.17",
+    "koa": "^2.13.0",
     "web3": "^1.3.0"
   }
 }

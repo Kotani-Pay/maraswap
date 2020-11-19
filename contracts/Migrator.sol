@@ -1,37 +1,39 @@
+// SPDX-License-Identifier: GPL-3.0
+
 pragma solidity 0.6.12;
 
-import "./uniswapv2/interfaces/IUniswapV2Pair.sol";
-import "./uniswapv2/interfaces/IUniswapV2Factory.sol";
+import "./kotani/interfaces/IKotaniPair.sol";
+import "./kotani/interfaces/IKotaniFactory.sol";
 
 
 contract Migrator {
-    address public chef;
+    address public minter;
     address public oldFactory;
-    IUniswapV2Factory public factory;
+    IKotaniFactory public factory;
     uint256 public notBeforeBlock;
     uint256 public desiredLiquidity = uint256(-1);
 
     constructor(
-        address _chef,
+        address _minter,
         address _oldFactory,
-        IUniswapV2Factory _factory,
+        IKotaniFactory _factory,
         uint256 _notBeforeBlock
     ) public {
-        chef = _chef;
+        minter = _minter;
         oldFactory = _oldFactory;
         factory = _factory;
         notBeforeBlock = _notBeforeBlock;
     }
 
-    function migrate(IUniswapV2Pair orig) public returns (IUniswapV2Pair) {
-        require(msg.sender == chef, "not from master chef");
+    function migrate(IKotaniPair orig) public returns (IKotaniPair) {
+        require(msg.sender == minter, "not from minter");
         require(block.number >= notBeforeBlock, "too early to migrate");
         require(orig.factory() == oldFactory, "not from old factory");
         address token0 = orig.token0();
         address token1 = orig.token1();
-        IUniswapV2Pair pair = IUniswapV2Pair(factory.getPair(token0, token1));
-        if (pair == IUniswapV2Pair(address(0))) {
-            pair = IUniswapV2Pair(factory.createPair(token0, token1));
+        IKotaniPair pair = IKotaniPair(factory.getPair(token0, token1));
+        if (pair == IKotaniPair(address(0))) {
+            pair = IKotaniPair(factory.createPair(token0, token1));
         }
         uint256 lp = orig.balanceOf(msg.sender);
         if (lp == 0) return pair;
